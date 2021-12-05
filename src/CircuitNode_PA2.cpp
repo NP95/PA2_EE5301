@@ -7,11 +7,14 @@
 
 void CircuitNode::setGateArea(const int& area)
 {
-
+  area = area; 
 }
 
 void CircuitNode::set_x_coordinate(const int& x_coordinate)
-{}
+{
+
+
+}
 
 void CircuitNode::set_y_coordinate(const int& y_coordinate)
 {}
