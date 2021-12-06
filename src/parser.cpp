@@ -11,6 +11,8 @@
 
 using namespace std;
 unordered_map<string, int> GateMap;
+unordered_map<string,list::string> FanOutMap;
+unordered_map<string,int> ConstructionIDMap;
 
 int initChipWidth = 0;
 int initChipHeight = 0;
@@ -44,9 +46,9 @@ Circuit::Circuit(const std::string& ckt_file):
     const regex input_pad_regex_isc85("INPUT\\((\\d+)\\)");
     const regex output_pad_regex_isc85("OUTPUT\\((\\d+)\\)");
     const regex node_regex_isc85("(\\d+)=([a-zA-Z0-9_]+)\\(([0-9,\\s]+)\\)");
-    const regex input_pad_regex_itc99("INPUT\\([a-zA-Z0-9_]+\\)");
-    const regex output_pad_regex_itc99("OUTPUT\\(([a-zA-Z0-9_]+)\\)";
-    const regex node_regex_itc99("([a-zA-Z0-9_]+)=[A-Z]+\\(([a-zA-Z0-9_]+,?)+\\)");
+    const regex input_pad_regex_itc99("INPUT\\(([a-zA-Z0-9_]+)\\)");
+    const regex output_pad_regex_itc99("OUTPUT\\(([a-zA-Z0-9_]+)\\)");
+    const regex node_regex_itc99("([a-zA-Z0-9_]+)=([A-Z]+)\\((([a-zA-Z0-9_]+,?)+)\\");
 
     const regex isc85_detect("# c[0-9]*");
 
@@ -55,6 +57,9 @@ Circuit::Circuit(const std::string& ckt_file):
     smatch output_pad_regex_match;
     smatch input_pad_regex_match;
     smatch node_regexMatch;
+    //For node_regexMatch smatch
+    // smatch[3] is the gate type
+    // smatch[2] is the fan_in list from the file, further processing is needed for extracting the 
     //A flag to process first line after the first comment all comments are ignored
     int file_type_check_status = 0;
     while (ifs.good()) {
@@ -157,7 +162,7 @@ Circuit::Circuit(const std::string& ckt_file):
             Node_Construction_ID++
             allocate_for_node_id(Node_Construction_ID);
             nodes_[Node_Construction_ID]->set_node_id(node_id);
-            nodes_[node_id]->set_input_pad(true);
+            
             continue;
         }
 
@@ -169,7 +174,7 @@ Circuit::Circuit(const std::string& ckt_file):
             Node_Construction_ID++
             allocate_for_node_id(Node_Construction_ID);
             nodes_[Node_Construction_ID]->set_node_id(node_id);
-            allocate_for_node_id(node_id);
+	    nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
            // nodes_[node_id]->set_node_id(node_id);
            // nodes_[node_id]->set_output_pad(true);
             continue;

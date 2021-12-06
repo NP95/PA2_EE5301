@@ -1,5 +1,6 @@
 Gameplan
 
+
 1. Take in the file
 2. Check whether the file is a ISCAS85 or ITC99i (Done)
 
@@ -22,7 +23,9 @@ b. The data structure
 ->2. x,y coordinates
 ->3. fan in
 ->4. Calculate area of gate,store it and add it to initial chip area
+For the ISC85, construct the graph as it was in PA1 and for ITC 99 use  a construction ID as you are constructing the graph
 
+Your graph will be Node,<Fan-In-List>
 Once the graph is created then, you have a rectangle x units by y units
 
 What is x and y?
@@ -39,5 +42,20 @@ b/ For ITC99
 5. How should you reason behind the initial random placement
 6. Function for calculating the HPWL and doesn't matter in this case inplace implementation would be faster
 Not a 1-1 map, first determine the gate type and then the number of inputs
+
+Define your chip data structure
+ChipHeight number of columns (fixed) 
+ChipWidth can change per row
+
+Each element in this matrix should have a flag which says occupied or not,
+How do you ensure that there is no overlap
+
+Generate two random construction ids
+
+Legal placement is allowed only if 
+
+all locations in range of (cell1.xcoordinate + widthofcell2) if cell1 is removed are empty
+
+all locations in range of (cell2.xcoordinate + widthofcell1) if cell2 is removed are empty
 
 
