@@ -8,6 +8,7 @@
 #include "CircuitNode.hpp"
 //A circuit is made of nodes so the node definition is in the CircuitNode.hpp file
 // Hierarchy of the files are  base 1. CircuitNode.hpp 2. CircuitNode.cpp 3.Circuit.hpp 4. Circuit.cpp
+// Compared to PA1 since the data structure for the node is a bit different, for referencing a particular node instead of a NodeID we are using a construction ID, since our graph is a vector of nodes, and we are giving an index to each node using a construction id, for ISC85 the string nodeID is converted to integer
 class Circuit {
     private:
         // Store a pointer to CircuitNode, so each resize only moves pointers around
@@ -23,7 +24,7 @@ class Circuit {
         Circuit(const std::string& ckt_file);
         ~Circuit();
 
-        void print_node_info(const NodeID& node_id);
+        void print_node_info(const int& construction_id);
         void test();
 };
 

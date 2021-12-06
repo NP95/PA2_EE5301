@@ -11,6 +11,7 @@
 
 using namespace std;
 unordered_map<string, int> GateMap;
+
 int initChipWidth = 0;
 int initChipHeight = 0;
 int SumGatesArea = 0;
@@ -44,7 +45,7 @@ Circuit::Circuit(const std::string& ckt_file):
     const regex output_pad_regex_isc85("OUTPUT\\((\\d+)\\)");
     const regex node_regex_isc85("(\\d+)=([a-zA-Z0-9_]+)\\(([0-9,\\s]+)\\)");
     const regex input_pad_regex_itc99("INPUT\\([a-zA-Z0-9_]+\\)");
-    const regex output_pad_regex_itc99("OUTPUT\\([a-zA-Z0-9_]+\\))";
+    const regex output_pad_regex_itc99("OUTPUT\\(([a-zA-Z0-9_]+)\\)";
     const regex node_regex_itc99("([a-zA-Z0-9_]+)=[A-Z]+\\(([a-zA-Z0-9_]+,?)+\\)");
 
     const regex isc85_detect("# c[0-9]*");
@@ -95,7 +96,6 @@ Circuit::Circuit(const std::string& ckt_file):
             int  construction_id = stoi(input_pad_regex_match[1]);            
             allocate_for_node_id(node_id);
             nodes_[node_id]->set_node_id(node_id);
-            nodes_[node_id]->set_input_pad(true);
             continue;
         }
 
@@ -106,7 +106,6 @@ Circuit::Circuit(const std::string& ckt_file):
             int  construction_id = stoi(input_pad_regex_match[1]);            
             allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
-            nodes_[node_id]->set_output_pad(true);
             continue;
         }
 
