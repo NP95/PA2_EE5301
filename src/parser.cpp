@@ -129,7 +129,7 @@ Circuit::Circuit(const std::string& ckt_file):
 	    //Output nodes have a fanout, not a fanin
             continue;
         }
-
+         list<string> temp_fanin;
         // Find <nodeNumber>=(<nodeNumber...>)
         regex_match(code_line, node_regexMatch, node_regex_isc_85);
         if (node_regexMatch.size() > 0) {
@@ -143,9 +143,10 @@ Circuit::Circuit(const std::string& ckt_file):
 
             stringstream node_ids_str(node_regexMatch[3]);
    while(node_ids_str.good()) {
-      string substr;
-      getline(s_stream, substr, ','); //get first string delimited by comma
-      temp_fanin.push_back(substr);
+      string fanin_elem;
+      getline(s_stream, fanin_elem, ','); //get first string delimited by comma
+      temp_fanin.push_back(fanin_elem);
+      nodes_[construction_id]->add_tofanin_list(fanin_elem);
    }
              
 
@@ -160,7 +161,7 @@ Circuit::Circuit(const std::string& ckt_file):
 
    gate_area = scaling_factor*(GateMap.at(s2));
    cout << "Area of gate = " << gate_area << endl;
-
+   SumGatesArea = SumGatesArea + gate_area;
 	    // Rewrite this part to get 
           //  NodeID input_node_id;
            // char delim;
@@ -240,8 +241,8 @@ Circuit::Circuit(const std::string& ckt_file):
 
         }
 }
-initChipWidth = ceil(sqrt(sumGateArea));
-initCHipHeight = ceil(sumGateArea/initChipWidth);
+initChipWidth = ceil(sqrt(SumGateArea));
+initCHipHeight = ceil(SumGateArea/initChipWidth);
 
 Circuit::~Circuit() {
     for(const auto& node_ptr: nodes_) {
