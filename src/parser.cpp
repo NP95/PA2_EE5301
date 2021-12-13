@@ -33,7 +33,7 @@ GateMap.insert(make_pair("OUTPUT",1));
 GateMap.insert(make_pair("DFF",9));
 
 Circuit::Circuit(const std::string& ckt_file):
-        // Call the constructor of GateDatabase
+        // Initialize the file type flags
     bool file_type_is_ITC99 = false;
     bool file_type_is_ISC85 = false;
     // cout << "Parsing circuit file: " << ckt_file << endl;
@@ -101,8 +101,8 @@ Circuit::Circuit(const std::string& ckt_file):
         // Find INPUT(<nodeNumber>)
         regex_match(code_line, input_pad_regex_match, input_pad_regex_isc85);
         if (input_pad_regex_match.size() > 0) {
-		//DO shitz with unordered_maps_here
-		//Validdation linke https://onlinegdb.com/VIwl8c6Pg
+		//DO stuff with unordered_maps_here
+		//Validation linke https://onlinegdb.com/VIwl8c6Pg
 	    ConstructionIDMap.insert(node_id,construction_id);
 	    NodeID node_id = input_pad_regex_match[1];
              construction_id = stoi(node_id); //Stoi is only for a ISC85
@@ -112,6 +112,7 @@ Circuit::Circuit(const std::string& ckt_file):
 	    nodes_[construction_id]->set_gate_area(1);
 	    nodes_[construction_id]->set_gate_type("INPUT");
 	    //Input nodes have a fanin not a fanout
+	    SumGatesArea = SumGatesArea + 1;
             continue;
         }
 
@@ -126,13 +127,20 @@ Circuit::Circuit(const std::string& ckt_file):
             nodes_[node_id]->set_node_id(node_id);
 	    nodes_[construction_id]->set_gate_area(1);
 	    nodes_[construction_id]->set_gate_type("OUTPUT");
+	    SumGatesArea = SumGatesArea + 1;
 	    //Output nodes have a fanout, not a fanin
             continue;
         }
-         list<string> temp_fanin;
+         list<string> temp_fanin;    
+	 int gate_area = 0;
+         int extracted_gate_area = 0;
+         double faninsize = 0.0;
+         int scaling_factor;
+
         // Find <nodeNumber>=(<nodeNumber...>)
         regex_match(code_line, node_regexMatch, node_regex_isc_85);
-        if (node_regexMatch.size() > 0) {
+        if (node_regexMatch.size() > 0) 
+	{
               construction_id = stoi(node_regexMatch[1]);
             string gate_type = node_regexMatch[2];
             transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
@@ -142,26 +150,28 @@ Circuit::Circuit(const std::string& ckt_file):
             nodes_[node_id]->set_gate_type(gate_type);
 
             stringstream node_ids_str(node_regexMatch[3]);
-   while(node_ids_str.good()) {
-      string fanin_elem;
-      getline(s_stream, fanin_elem, ','); //get first string delimited by comma
-      temp_fanin.push_back(fanin_elem);
-      nodes_[construction_id]->add_tofanin_list(fanin_elem);
-   }
+    
+	    while(node_ids_str.good()) 
+	    {
+                  string fanin_elem;
+                  getline(s_stream, fanin_elem, ','); //get first string delimited by comma
+                  temp_fanin.push_back(fanin_elem); // We probably want to allocate these nodes as a part of the graph here itself using the ConstructionMap
+                  nodes_[construction_id]->add_tofanin_list(fanin_elem);
+             }
              
 
 
 
 
-      faninsize = temp_fanin.size();
-   scaling_factor = ceil(faninsize/2);
-   cout << scaling_factor << " "<<endl;
-   extracted_gate_area = GateMap.at(s2);
-   cout << "2 Input gate area " << extracted_gate_area << endl;
+          faninsize = temp_fanin.size();
+          scaling_factor = ceil(faninsize/2);
+         // cout << scaling_factor << " "<<endl;
+          extracted_gate_area = GateMap.at(s2);
+         // cout << "2 Input gate area " << extracted_gate_area << endl;
 
-   gate_area = scaling_factor*(GateMap.at(s2));
-   cout << "Area of gate = " << gate_area << endl;
-   SumGatesArea = SumGatesArea + gate_area;
+          gate_area = scaling_factor*(GateMap.at(s2));
+          cout << "Area of gate = " << gate_area << endl;
+          SumGatesArea = SumGatesArea + gate_area;
 	    // Rewrite this part to get 
           //  NodeID input_node_id;
            // char delim;
@@ -360,6 +370,8 @@ void Circuit::test() {
 //Initial function_list
 //random_placement( pointers to list, chip datastructure)
 //Initial HPWL
+//
+//Random Placement
 //Swap 2 nodes
 //Legal overlap
 //Insert(empty space)
