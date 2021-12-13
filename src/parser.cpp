@@ -12,11 +12,13 @@
 using namespace std;
 unordered_map<string, int> GateMap;
 unordered_map<string,list::string> FanOutMap;
+//For messy ITC99 file
 unordered_map<string,int> ConstructionIDMap;
 
 int initChipWidth = 0;
 int initChipHeight = 0;
 int SumGatesArea = 0;
+
 
 GateMap.insert(make_pair("NOT", 1));
 GateMap.insert(make_pair("BUFF", 2));
@@ -40,7 +42,8 @@ Circuit::Circuit(const std::string& ckt_file):
         cout << "Error opening file " << ckt_file << endl;
         return;
     }
-    int Node_Construction_ID = 0;
+    int Node_Construction_ID = 0; //Use this for 
+    int construction_id; // Use this for ISC85
     nodes_.reserve(NODE_BUF_SIZE);
 
     const regex input_pad_regex_isc85("INPUT\\((\\d+)\\)");
@@ -98,39 +101,72 @@ Circuit::Circuit(const std::string& ckt_file):
         // Find INPUT(<nodeNumber>)
         regex_match(code_line, input_pad_regex_match, input_pad_regex_isc85);
         if (input_pad_regex_match.size() > 0) {
-            int  construction_id = stoi(input_pad_regex_match[1]);            
-            allocate_for_node_id(node_id);
+		//DO shitz with unordered_maps_here
+		//Validdation linke https://onlinegdb.com/VIwl8c6Pg
+	    ConstructionIDMap.insert(node_id,construction_id);
+	    NodeID node_id = input_pad_regex_match[1];
+             construction_id = stoi(node_id); //Stoi is only for a ISC85
+            //ConstructionIDMap.insert(node_id,construction_id);	    
+            allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
+	    nodes_[construction_id]->set_gate_area(1);
+	    nodes_[construction_id]->set_gate_type("INPUT");
+	    //Input nodes have a fanin not a fanout
             continue;
         }
 
         // Find OUTPUT(<nodeNumber>)
         regex_match(code_line, output_pad_regex_match, output_pad_regex_isc_85);
         if (output_pad_regex_match.size() > 0) {
-	                
-            int  construction_id = stoi(input_pad_regex_match[1]);            
+	     //  https://onlinegdb.com/SF37Qaukm
+	    NodeID node_id = input_pad_regex_match[1];
+              construction_id = stoi(node_id);
+           // ConstructionIDMap.insert(node_id,construction_id);	    
             allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
+	    nodes_[construction_id]->set_gate_area(1);
+	    nodes_[construction_id]->set_gate_type("OUTPUT");
+	    //Output nodes have a fanout, not a fanin
             continue;
         }
 
         // Find <nodeNumber>=(<nodeNumber...>)
         regex_match(code_line, node_regexMatch, node_regex_isc_85);
         if (node_regexMatch.size() > 0) {
-             int construction_id = stoi(node_regexMatch[1]);
+              construction_id = stoi(node_regexMatch[1]);
             string gate_type = node_regexMatch[2];
             transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
-            allocate_for_node_id(node_id);
+            allocate_for_node_id(construction_id);
 
-            nodes_[node_id]->set_node_id(node_id);
+            nodes_[construction_id]->set_node_id(node_id);
             nodes_[node_id]->set_gate_type(gate_type);
 
             stringstream node_ids_str(node_regexMatch[3]);
-            NodeID input_node_id;
-            char delim;
-            while (node_ids_str >> input_node_id) {
-                nodes_[node_id]->add_to_fanin_list(input_node_id);
-                node_ids_str >> delim;
+   while(node_ids_str.good()) {
+      string substr;
+      getline(s_stream, substr, ','); //get first string delimited by comma
+      temp_fanin.push_back(substr);
+   }
+             
+
+
+
+
+      faninsize = temp_fanin.size();
+   scaling_factor = ceil(faninsize/2);
+   cout << scaling_factor << " "<<endl;
+   extracted_gate_area = GateMap.at(s2);
+   cout << "2 Input gate area " << extracted_gate_area << endl;
+
+   gate_area = scaling_factor*(GateMap.at(s2));
+   cout << "Area of gate = " << gate_area << endl;
+
+	    // Rewrite this part to get 
+          //  NodeID input_node_id;
+           // char delim;
+          // while (node_ids_str >> input_node_id) {
+            //    nodes_[node_id]->add_to_fanin_list(input_node_id);
+              //  node_ids_str >> delim;
 
 
           //1. First get the fanin list_size
@@ -317,3 +353,14 @@ void Circuit::test() {
     // }
     cout << endl;
 }
+
+
+
+//Initial function_list
+//random_placement( pointers to list, chip datastructure)
+//Initial HPWL
+//Swap 2 nodes
+//Legal overlap
+//Insert(empty space)
+//Calculate k
+// Wirite the annealing engine

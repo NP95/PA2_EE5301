@@ -1,6 +1,9 @@
 Gameplan
 
 
+
+
+
 1. Take in the file
 2. Check whether the file is a ISCAS85 or ITC99i (Done)
 
@@ -44,8 +47,20 @@ b/ For ITC99
 Not a 1-1 map, first determine the gate type and then the number of inputs
 
 Define your chip data structure
+A 2D array of structs 
+
+http://www.cplusplus.com/forum/beginner/15967/
+https://stackoverflow.com/questions/2329581/c-pointers-how-to-assign-value-to-a-pointer-struct
+
+typedef struct GateLocation
+{
+   bool occupied = false;
+}
+
 ChipHeight number of columns (fixed) 
 ChipWidth can change per row
+
+http://csci.viu.ca/~wesselsd/courses/csci160/examples/2darr/index.html
 
 Each element in this matrix should have a flag which says occupied or not,
 How do you ensure that there is no overlap

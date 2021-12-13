@@ -20,4 +20,4 @@ b. The data structure
 6. Function for calculating the HPWL and doesn't matter in this case inplace implementation would be faster
 Not a 1-1 map, first determine the gate type and then the number of inputs
 
-
+What are the moves
