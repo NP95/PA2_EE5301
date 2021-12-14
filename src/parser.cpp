@@ -12,7 +12,6 @@
 using namespace std;
 unordered_map<string, int> GateMap;
 unordered_map<string,list::string> FanOutMap;
-//For messy ITC99 file
 unordered_map<string,int> ConstructionIDMap;
 
 int initChipWidth;
@@ -103,10 +102,10 @@ Circuit::Circuit(const std::string& ckt_file):
         if (input_pad_regex_match.size() > 0) {
 		//DO stuff with unordered_maps_here
 		//Validation linke https://onlinegdb.com/VIwl8c6Pg
-	    ConstructionIDMap.insert(node_id,construction_id);
 	    NodeID node_id = input_pad_regex_match[1];
              construction_id = stoi(node_id); //Stoi is only for a ISC85
-            ConstructionIDMap.insert(node_id,construction_id);	    
+	     
+	    ConstructionIDMap.insert(make_pair(node_id,construction_id));
             allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
 	    nodes_[construction_id]->set_gate_area(1);
@@ -338,11 +337,6 @@ void Circuit::print_node_info(const NodeID& node_id) {
             nodes_[node_id]->get_fanin_list().front() << " " <<
             nodes_[node_id]->get_fanin_list().back() << " ";
             
-            const GateInfo* gate_info = nodes_[node_id]->get_gate_info();
-            if (gate_info == nullptr) {
-                cout << 0.;
-            } else {
-                cout << gate_info->output_slew[2][1];
             }
     }
     cout << endl;
