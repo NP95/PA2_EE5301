@@ -15,8 +15,8 @@ unordered_map<string,list::string> FanOutMap;
 //For messy ITC99 file
 unordered_map<string,int> ConstructionIDMap;
 
-int initChipWidth = 0;
-int initChipHeight = 0;
+int initChipWidth;
+int initChipHeight;
 int SumGatesArea = 0;
 
 
@@ -87,7 +87,7 @@ Circuit::Circuit(const std::string& ckt_file):
         // We only need to parse before the comment
         string code_line = line.substr(0, line.find("#"));
 
-	//If the file type is ISC85 do this shizz bang
+	//If the file type is ISC85 do this
 	if(file_type_is_ISC85)
           {
         // Remove all whitespace to make regex simpler
@@ -106,7 +106,7 @@ Circuit::Circuit(const std::string& ckt_file):
 	    ConstructionIDMap.insert(node_id,construction_id);
 	    NodeID node_id = input_pad_regex_match[1];
              construction_id = stoi(node_id); //Stoi is only for a ISC85
-            //ConstructionIDMap.insert(node_id,construction_id);	    
+            ConstructionIDMap.insert(node_id,construction_id);	    
             allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
 	    nodes_[construction_id]->set_gate_area(1);
@@ -122,7 +122,7 @@ Circuit::Circuit(const std::string& ckt_file):
 	     //  https://onlinegdb.com/SF37Qaukm
 	    NodeID node_id = input_pad_regex_match[1];
               construction_id = stoi(node_id);
-           // ConstructionIDMap.insert(node_id,construction_id);	    
+            ConstructionIDMap.insert(node_id,construction_id);	    
             allocate_for_node_id(construction_id);
             nodes_[node_id]->set_node_id(node_id);
 	    nodes_[construction_id]->set_gate_area(1);
@@ -141,12 +141,19 @@ Circuit::Circuit(const std::string& ckt_file):
         regex_match(code_line, node_regexMatch, node_regex_isc_85);
         if (node_regexMatch.size() > 0) 
 	{
+		string gate_type;
+	if(!(ConstructionIDMap.count(node_regexMatch[1]))
+	     {
               construction_id = stoi(node_regexMatch[1]);
-            string gate_type = node_regexMatch[2];
-            transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
-            allocate_for_node_id(construction_id);
+	      //Check for existence and then insert
+	      //If exists then process as it is,as the only field modified would be the fanout field
 
+            allocate_for_node_id(construction_id);
             nodes_[construction_id]->set_node_id(node_id);
+             ConstructionIDMap.insert(make_pair(node_id,construction_id));
+	     }
+            gate_type = node_regexMatch[2];
+            transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
             nodes_[node_id]->set_gate_type(gate_type);
 
             stringstream node_ids_str(node_regexMatch[3]);
@@ -157,10 +164,22 @@ Circuit::Circuit(const std::string& ckt_file):
                   getline(s_stream, fanin_elem, ','); //get first string delimited by comma
                   temp_fanin.push_back(fanin_elem); // We probably want to allocate these nodes as a part of the graph here itself using the ConstructionMap
                   nodes_[construction_id]->add_tofanin_list(fanin_elem);
+		  if(!ConstructionIDMap.count(fanin_elem))
+		  {
+			int fan_out_construction_id = stoi(fanin_elem);
+		        allocate_for_node_id(fan_out_construction_id);
+			nodes_[construction_id]->set_node_id(construction_id);
+		        ConstructionIDMap.insert(make_pair(fanin_elem,construction_id);	
+		  }
              }
-             
 
-
+            list<string> current;
+	    for (auto const& i : temp_fanin) 
+	    {
+                    
+		  //Correct usage of umap.insert
+		  FanOutMap.insert(make_pair(i,current.push_back(node_regexMatch[1]));
+             }
 
 
           faninsize = temp_fanin.size();
@@ -170,7 +189,8 @@ Circuit::Circuit(const std::string& ckt_file):
          // cout << "2 Input gate area " << extracted_gate_area << endl;
 
           gate_area = scaling_factor*(GateMap.at(s2));
-          cout << "Area of gate = " << gate_area << endl;
+	  nodes_[node_id]->set_gate_area(gate_area);
+    //      cout << "Area of gate = " << gate_area << endl;
           SumGatesArea = SumGatesArea + gate_area;
 	    // Rewrite this part to get 
           //  NodeID input_node_id;
@@ -251,8 +271,19 @@ Circuit::Circuit(const std::string& ckt_file):
 
         }
 }
+
+//Here you add the fan_out to all the nodes
+
 initChipWidth = ceil(sqrt(SumGateArea));
-initCHipHeight = ceil(SumGateArea/initChipWidth);
+initChipHeight = ceil(SumGateArea/initChipWidth);
+
+//Initialize the chip here
+vector<vector<gate_location>> Chip;
+Chip.resize(initChipHeight);
+for (int i = 0; i < initChipHeight; ++i)
+    Chip[i].resize(ChipWidth);
+//We now have our ChipSize initialized
+ 
 
 Circuit::~Circuit() {
     for(const auto& node_ptr: nodes_) {
@@ -366,6 +397,10 @@ void Circuit::test() {
 }
 
 
+//void RandomPlacement()
+//{};
+
+//int initial_HPWL()
 
 //Initial function_list
 //random_placement( pointers to list, chip datastructure)
