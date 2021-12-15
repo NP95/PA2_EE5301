@@ -104,13 +104,13 @@ Circuit::Circuit(const std::string& ckt_file):
 		//Validation linke https://onlinegdb.com/VIwl8c6Pg
 	    NodeID node_id = input_pad_regex_match[1];
              construction_id = stoi(node_id); //Stoi is only for a ISC85
-	     
 	    ConstructionIDMap.insert(make_pair(node_id,construction_id));
             allocate_for_node_id(construction_id);
-            nodes_[node_id]->set_node_id(node_id);
+            nodes_[construction_id]->set_node_id(node_id);
+            nodes_[construction_id]->set_construction_id(construction_id);
 	    nodes_[construction_id]->set_gate_area(1);
 	    nodes_[construction_id]->set_gate_type("INPUT");
-	    //Input nodes have a fanin not a fanout
+	    //Input nodes have a fanin list
 	    SumGatesArea = SumGatesArea + 1;
             continue;
         }
@@ -123,7 +123,8 @@ Circuit::Circuit(const std::string& ckt_file):
               construction_id = stoi(node_id);
             ConstructionIDMap.insert(node_id,construction_id);	    
             allocate_for_node_id(construction_id);
-            nodes_[node_id]->set_node_id(node_id);
+            nodes_[construction_id]->set_node_id(node_id);
+	    nodes_[construction_id]->set_construction_id(construction_id);
 	    nodes_[construction_id]->set_gate_area(1);
 	    nodes_[construction_id]->set_gate_type("OUTPUT");
 	    SumGatesArea = SumGatesArea + 1;
@@ -149,6 +150,7 @@ Circuit::Circuit(const std::string& ckt_file):
 
             allocate_for_node_id(construction_id);
             nodes_[construction_id]->set_node_id(node_id);
+	    nodes_[construction_id]->set_construction_id(construction_id);
              ConstructionIDMap.insert(make_pair(node_id,construction_id));
 	     }
             gate_type = node_regexMatch[2];
@@ -167,8 +169,8 @@ Circuit::Circuit(const std::string& ckt_file):
 		  {
 			int fan_out_construction_id = stoi(fanin_elem);
 		        allocate_for_node_id(fan_out_construction_id);
-			nodes_[construction_id]->set_node_id(construction_id);
-		        ConstructionIDMap.insert(make_pair(fanin_elem,construction_id);	
+			nodes_[fan_out_construction_id]->set_node_id(fan_out_construction_id);
+		        ConstructionIDMap.insert(make_pair(fanin_elem,fan_out_construction_id);	
 		  }
              }
 
@@ -188,7 +190,7 @@ Circuit::Circuit(const std::string& ckt_file):
          // cout << "2 Input gate area " << extracted_gate_area << endl;
 
           gate_area = scaling_factor*(GateMap.at(s2));
-	  nodes_[node_id]->set_gate_area(gate_area);
+	  nodes_[construction_id]->set_gate_area(gate_area);
     //      cout << "Area of gate = " << gate_area << endl;
           SumGatesArea = SumGatesArea + gate_area;
 	    // Rewrite this part to get 
@@ -223,47 +225,97 @@ Circuit::Circuit(const std::string& ckt_file):
         // Find INPUT(<nodeNumber>)
         regex_match(code_line, input_pad_regex_match, input_pad_regex_itc99);
         if (input_pad_regex_match.size() > 0) {
-            //NodeID node_id = (input_pad_regex_match[1]);
-	    
+            NodeID node_id = (input_pad_regex_match[1]);
             Node_Construction_ID++
             allocate_for_node_id(Node_Construction_ID);
             nodes_[Node_Construction_ID]->set_node_id(node_id);
-            
+            nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
+            ConstructionIDMap.insert(make_pair(node_id,Node_Construction_ID));
+	    nodes_[Node_Construction_ID]->set_gate_area(1);
+	    nodes_[Node_Construction_ID]->set_gate_type("INPUT");
+	    SumGatesArea = SumGatesArea + 1;
             continue;
         }
 
         // Find OUTPUT(<nodeNumber>)
         regex_match(code_line, output_pad_regex_match, output_pad_regex_itc99);
         if (output_pad_regex_match.size() > 0) {
-         //   NodeID node_id = stoi(output_pad_regex_match[1]);
-	                
-            Node_Construction_ID++
-            allocate_for_node_id(Node_Construction_ID);
-            nodes_[Node_Construction_ID]->set_node_id(node_id);
-	    nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
+           NodeID node_id = stoi(output_pad_regex_match[1]);
+           Node_Construction_ID++
+           allocate_for_node_id(Node_Construction_ID);
+           nodes_[Node_Construction_ID]->set_node_id(node_id);
+	   nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
+           ConstructionIDMap.insert(make_pair(node_id,Node_Construction_ID));
+	   nodes_[Node_Construction_ID]->set_gate_area(1);
+	   nodes_[Node_Construction_ID]->set_gate_type("OUTPUT");
+	   SumGatesArea = SumGatesArea + 1;
            // nodes_[node_id]->set_node_id(node_id);
            // nodes_[node_id]->set_output_pad(true);
             continue;
         }
 
+
+	  list<string> temp_fanin;
+          int gate_area = 0;
+          int extracted_gate_area = 0;
+          double faninsize = 0.0;
+          int scaling_factor;
+
         // Find <nodeNumber>=(<nodeNumber...>)
         regex_match(code_line, node_regexMatch, node_regex_itc99);
         if (node_regexMatch.size() > 0) {
-            NodeID node_id = stoi(node_regexMatch[1]);
-            string gate_type = node_regexMatch[2];
+                         string gate_type;
+        if(!(ConstructionIDMap.count(node_regexMatch[1]))
+             {
+	     Node_Construction_ID++;
+            //  construction_id = stoi(node_regexMatch[1]);
+              //Check for existence and then insert
+              //If exists then process as it is,as the only field modified would be the fanout field
+            
+            allocate_for_node_id(Node_Construction_ID);
+            nodes_[Node_Construction_ID]->set_node_id(node_id);
+            nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
+             ConstructionIDMap.insert(make_pair(node_id,Node_Construction_ID));
+             }
+            gate_type = node_regexMatch[2];
             transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
-            allocate_for_node_id(node_id);
-
-            nodes_[node_id]->set_node_id(node_id);
             nodes_[node_id]->set_gate_type(gate_type);
-            nodes_[node_id]->set_gate_info(gate_db_.get_gate_info(gate_type));
 
             stringstream node_ids_str(node_regexMatch[3]);
-            NodeID input_node_id;
-            char delim;
-            while (node_ids_str >> input_node_id) {
-                nodes_[node_id]->add_to_fanin_list(input_node_id);
-                node_ids_str >> delim;
+    
+            while(node_ids_str.good()) 
+            {
+                  string fanin_elem;
+                  getline(s_stream, fanin_elem, ','); //get first string delimited by comma
+                  temp_fanin.push_back(fanin_elem); // We probably want to allocate these nodes as a part of the graph here itself using the ConstructionMap
+                  nodes_[construction_id]->add_tofanin_list(fanin_elem);
+                  if(!ConstructionIDMap.count(fanin_elem))
+                  {
+			  Node_Construction_ID++
+                     //   int fan_out_construction_id = stoi(fanin_elem);
+                        allocate_for_node_id(Node_Construction_ID);
+                        nodes_[Node_Construction_ID]->set_node_id(Node_Construction_ID);
+                        ConstructionIDMap.insert(make_pair(fanin_elem,Node_Construction_ID); 
+                  }
+             }
+
+            list<string> current;
+            for (auto const& i : temp_fanin) 
+            {
+    
+                  //Correct usage of umap.insert
+                  FanOutMap.insert(make_pair(i,current.push_back(node_regexMatch[1]));
+             }
+
+
+          faninsize = temp_fanin.size();
+          scaling_factor = ceil(faninsize/2);
+          extracted_gate_area = GateMap.at(s2);
+
+          gate_area = scaling_factor*(GateMap.at(s2));
+          nodes_[construction_id]->set_gate_area(gate_area);
+          SumGatesArea = SumGatesArea + gate_area;
+   NodeID node_id = stoi(node_regexMatch[1]);
             }
             continue;
         }
