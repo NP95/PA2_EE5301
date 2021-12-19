@@ -31,7 +31,7 @@ class CircuitNode {
 	void set_construction_id(const int& construction_id);
         void set_gate_type(const std::string& gate_type);
         void add_to_fanin_list(const NodeID& node_id);
-	void add_to_fanout_list(const NodeID& node_id)
+	void add_to_fanout_list(const NodeID& node_id);
 	
        //These are basically function declarations. The definitions are in a separate file 
         const NodeID& get_node_id() const;

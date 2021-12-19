@@ -16,7 +16,7 @@
 struct gate_location
 {
 	bool isOccupied = false;
-}
+};
 typedef struct gate_location gate_location;
 
 
@@ -32,7 +32,7 @@ class Circuit
        // GateDatabase gate_db_;
 
         // Resizes the nodes_ vector to fit the node_id
-        void allocate_for_node_id(const NodeID& node_id);
+        void allocate_for_node_id(const int& node_id);
     public:
         Circuit(const std::string& ckt_file);
         ~Circuit();

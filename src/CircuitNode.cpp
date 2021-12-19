@@ -10,24 +10,24 @@ void CircuitNode::set_node_id(const NodeID& node_id)
     node_id_ = node_id;
 }
 
-void CircuitNode::set_x_coordinate(const int& x_coordinate)
+void CircuitNode::set_x_coordinate(const int& x_coordinate_)
 {
-   x_coordinate = x_coordinate;
+   x_coordinate = x_coordinate_;
 }
 
-void CircuitNode::set_y_coordinate(const int& y_coordinate)
+void CircuitNode::set_y_coordinate(const int& y_coordinate_)
 {
-   y_coordinate = y_coordinate;
+   y_coordinate = y_coordinate_;
 }
 
-void CircuitNode::set_gate_area(const int& area)
+void CircuitNode::set_gate_area(const int& area_)
 {
-  area = area; 
+  area = area_; 
 }
 
-void CircuitNode::set_construction_id(const int& construction_id) 
+void CircuitNode::set_construction_id(const int& construction_id_) 
 {
-    construction_id = construction_id;
+    construction_id = construction_id_;
 }
 
 void CircuitNode::set_gate_type(const std::string& gate_type) 
