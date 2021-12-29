@@ -215,7 +215,6 @@ GateMap.insert(make_pair("DFF",9));
 
             continue;
         }
-	  }
     
 
 	else if(file_type_is_ITC99)
@@ -327,6 +326,12 @@ GateMap.insert(make_pair("DFF",9));
             }
             continue;
         }
+
+
+              else
+	      {
+	      cout << "Input a valid bench file" << endl;
+	      }
 initChipWidth = ceil(sqrt(SumGatesArea));
 initChipHeight = ceil(SumGatesArea/initChipWidth);
 
@@ -337,10 +342,6 @@ for (int i = 0; i < initChipHeight; ++i)
     Chip[i].resize(initChipWidth);
 //We now have our ChipSize initialized
 
-              else
-	      {
-	      cout << "Input a valid bench file" << endl;
-	      }
 	 
         }
 
