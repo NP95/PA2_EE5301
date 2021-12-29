@@ -20,7 +20,6 @@ struct gate_location
 typedef struct gate_location gate_location;
 
 
-
 class Circuit 
 {
     private:

@@ -87,7 +87,7 @@ GateMap.insert(make_pair("DFF",9));
 
         // We only need to parse before the comment
         string code_line = line.substr(0, line.find("#"));
-        NodeID node_id;
+        NodeID node_id; // What is the point of this? 
 	//If the file type is ISC85 do this
 	if(file_type_is_ISC85)
           {
@@ -215,9 +215,10 @@ GateMap.insert(make_pair("DFF",9));
 
             continue;
         }
-    }
+	  }
+    
 
-	if(file_type_is_ITC99)
+	else if(file_type_is_ITC99)
 	{
               
         // Remove all whitespace to make regex simpler
@@ -232,7 +233,7 @@ GateMap.insert(make_pair("DFF",9));
         regex_match(code_line, input_pad_regex_match, input_pad_regex_itc99);
         if (input_pad_regex_match.size() > 0) {
             NodeID node_id = (input_pad_regex_match[1]);
-            Node_Construction_ID++
+            Node_Construction_ID++;
             allocate_for_node_id(Node_Construction_ID);
             nodes_[Node_Construction_ID]->set_node_id(node_id);
             nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
@@ -246,8 +247,8 @@ GateMap.insert(make_pair("DFF",9));
         // Find OUTPUT(<nodeNumber>)
         regex_match(code_line, output_pad_regex_match, output_pad_regex_itc99);
         if (output_pad_regex_match.size() > 0) {
-           NodeID node_id = stoi(output_pad_regex_match[1]);
-           Node_Construction_ID++
+           NodeID node_id = output_pad_regex_match[1];
+           Node_Construction_ID++;
            allocate_for_node_id(Node_Construction_ID);
            nodes_[Node_Construction_ID]->set_node_id(node_id);
 	   nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
@@ -271,7 +272,8 @@ GateMap.insert(make_pair("DFF",9));
         regex_match(code_line, node_regexMatch, node_regex_itc99);
         if (node_regexMatch.size() > 0) {
                          string gate_type;
-        if(!(ConstructionIDMap.count(node_regexMatch[1]))
+			 NodeID node_id = node_regexMatch[1];
+        if(!(ConstructionIDMap.count(node_id)))
              {
 	     Node_Construction_ID++;
             //  construction_id = stoi(node_regexMatch[1]);
@@ -285,23 +287,24 @@ GateMap.insert(make_pair("DFF",9));
              }
             gate_type = node_regexMatch[2];
             transform(gate_type.begin(), gate_type.end(), gate_type.begin(), ::toupper);
-            nodes_[node_id]->set_gate_type(gate_type);
+            nodes_[Node_Construction_ID]->set_gate_type(gate_type);
 
             stringstream node_ids_str(node_regexMatch[3]);
     
             while(node_ids_str.good()) 
             {
                   string fanin_elem;
-                  getline(s_stream, fanin_elem, ','); //get first string delimited by comma
+                  getline(node_ids_str, fanin_elem, ','); //get first string delimited by comma
                   temp_fanin.push_back(fanin_elem); // We probably want to allocate these nodes as a part of the graph here itself using the ConstructionMap
-                  nodes_[construction_id]->add_tofanin_list(fanin_elem);
+                  nodes_[construction_id]->add_to_fanin_list(fanin_elem);
                   if(!ConstructionIDMap.count(fanin_elem))
                   {
-			  Node_Construction_ID++
+			  Node_Construction_ID++;
                      //   int fan_out_construction_id = stoi(fanin_elem);
                         allocate_for_node_id(Node_Construction_ID);
-                        nodes_[Node_Construction_ID]->set_node_id(Node_Construction_ID);
-                        ConstructionIDMap.insert(make_pair(fanin_elem,Node_Construction_ID); 
+                        nodes_[Node_Construction_ID]->set_node_id(fanin_elem);
+			nodes_[Node_Construction_ID]->set_construction_id(Node_Construction_ID);
+                        ConstructionIDMap.insert(make_pair(fanin_elem,Node_Construction_ID)); 
                   }
              }
 
@@ -310,37 +313,38 @@ GateMap.insert(make_pair("DFF",9));
             {
     
                   //Correct usage of umap.insert
-                  FanOutMap.insert(make_pair(i,current.push_back(node_regexMatch[1]));
+                  FanOutMap.insert(make_pair(i,current.push_back(node_id)));
              }
 
 
           faninsize = temp_fanin.size();
           scaling_factor = ceil(faninsize/2);
-          extracted_gate_area = GateMap.at(s2);
+          extracted_gate_area = GateMap.at(gate_type);
 
-          gate_area = scaling_factor*(GateMap.at(s2));
+          gate_area = scaling_factor*(GateMap.at(gate_type));
           nodes_[construction_id]->set_gate_area(gate_area);
           SumGatesArea = SumGatesArea + gate_area;
-   NodeID node_id = stoi(node_regexMatch[1]);
             }
             continue;
         }
-
-        }
-}
-
-
-//Here you add the fan_out to all the nodes
-
-initChipWidth = ceil(sqrt(SumGateArea));
-initChipHeight = ceil(SumGateArea/initChipWidth);
+initChipWidth = ceil(sqrt(SumGatesArea));
+initChipHeight = ceil(SumGatesArea/initChipWidth);
 
 //Initialize the chip here
 vector<vector<gate_location>> Chip;
 Chip.resize(initChipHeight);
 for (int i = 0; i < initChipHeight; ++i)
-    Chip[i].resize(ChipWidth);
+    Chip[i].resize(initChipWidth);
 //We now have our ChipSize initialized
+
+              else
+	      {
+	      cout << "Input a valid bench file" << endl;
+	      }
+	 
+        }
+
+
  
 
 Circuit::~Circuit() {
@@ -400,9 +404,9 @@ void Circuit::print_node_info(const NodeID& node_id) {
     }
     cout << endl;
 }
-
+/*
 void Circuit::test() {
-    /*
+    
     gate_db_.test();
     for(const auto& node: nodes_) {
         if (node.get_node_id() != -1) {
@@ -427,7 +431,7 @@ void Circuit::test() {
             cout << endl;
         }
     }
-    */
+    
 
     srand(0);
     for (int i = 0; i < 10;)
@@ -464,4 +468,4 @@ void Circuit::test() {
 //Legal overlap
 //Insert(empty space)
 //Calculate k
-// Wirite the annealing engine
+// Wirite the annealing engine*/
