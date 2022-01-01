@@ -346,7 +346,7 @@ for (int i = 0; i < initChipHeight; ++i)
         }
 
 
- 
+    } 
 
 Circuit::~Circuit() {
     for(const auto& node_ptr: nodes_) {
