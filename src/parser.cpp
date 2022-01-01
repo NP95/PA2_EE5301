@@ -212,11 +212,11 @@ GateMap.insert(make_pair("DFF",9));
 	  //3. Add to SumOfGatesArea
 
             }
-
+                 
             continue;
         }
 
-	  }    
+	      
 
 	else if(file_type_is_ITC99)
 	{
@@ -341,11 +341,9 @@ initChipHeight = ceil(SumGatesArea/initChipWidth);
 vector<vector<gate_location>> Chip;
 Chip.resize(initChipHeight);
 for (int i = 0; i < initChipHeight; ++i)
+ {
     Chip[i].resize(initChipWidth);
-//We now have our ChipSize initialized
-
-	 
-        }
+ }
 
 
     } 
