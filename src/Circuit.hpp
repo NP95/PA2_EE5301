@@ -37,7 +37,7 @@ class Circuit
         ~Circuit();
 
         void print_node_info(const int& construction_id);
-        void test();
+  //      void test();
 };
 
 #endif //CIRCUIT_HPP

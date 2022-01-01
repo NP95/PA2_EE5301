@@ -215,7 +215,8 @@ GateMap.insert(make_pair("DFF",9));
 
             continue;
         }
-    
+
+	  }    
 
 	else if(file_type_is_ITC99)
 	{
@@ -307,12 +308,13 @@ GateMap.insert(make_pair("DFF",9));
                   }
              }
 
-            list<string> current;
+            vector<string> current;
             for (auto const& i : temp_fanin) 
             {
     
                   //Correct usage of umap.insert
-                  FanOutMap.insert(make_pair(i,current.push_back(node_id)));
+		  current.push_back(node_id);
+		  FanOutMap.insert(make_pair(i,current));
              }
 
 
@@ -348,6 +350,8 @@ for (int i = 0; i < initChipHeight; ++i)
 
     } 
 
+ 
+
 Circuit::~Circuit() {
     for(const auto& node_ptr: nodes_) {
         if (node_ptr != nullptr)
@@ -378,8 +382,8 @@ void Circuit::allocate_for_node_id(const int& node_id) {
     }
 }
 
-void Circuit::print_node_info(const NodeID& node_id) {
-    if (node_id >= (NodeID) nodes_.size()) {
+void Circuit::print_node_info(const int& node_id) {
+    if (node_id >= (int) nodes_.size()) {
         cout << "Invalid Node ID: " << node_id << endl;
         cout << "We only have allocated for " << nodes_.size() << " nodes\n";
         return;
@@ -392,19 +396,20 @@ void Circuit::print_node_info(const NodeID& node_id) {
         cout << "Did not parse this Node ID from file\n";
         return;
     }
-
-    cout << node_id << " ";
-    if (nodes_[node_id]->is_input_pad()) {
-        cout << "INPUT";
-    } else {
-        cout << nodes_[node_id]->get_gate_type() << " " <<
-            nodes_[node_id]->get_fanin_list().front() << " " <<
-            nodes_[node_id]->get_fanin_list().back() << " ";
+      // This has to be modified to print all the fields
+        cout <<"Node ID: "<<nodes_[node_id]->get_node_id() << " " << endl;
+        cout <<"X Coordinate: "<<nodes_[node_id]->get_x_coordinate() << " " << endl;
+        cout <<"Y Coordinate: "<<nodes_[node_id]->get_y_coordinate() << " " << endl;
+        cout <<"Area: "<<nodes_[node_id]->get_area() << " " << endl;
+        cout <<"Construction ID: "<<nodes_[node_id]->get_construction_id() << " " << endl;
+        cout <<"Gate Type: "<<nodes_[node_id]->get_node_id() << " " << endl;
+        cout <<"Node ID: "<<nodes_[node_id]->get_node_id() << " " << endl;
+        cout <<"Node ID: "<<nodes_[node_id]->get_node_id() << " " << endl;
             
             }
-    }
-    cout << endl;
-}
+    
+//    cout << endl;
+
 /*
 void Circuit::test() {
     
