@@ -27,7 +27,9 @@ class Circuit
         // rather than the entire CircuitNode object. Additionally, any unused elements
         // will contain a nullptr rather than a empty CircuitNode object, saving memory
         std::vector<CircuitNode*> nodes_;
-	
+	int initChipWidth;
+	int initChipHeight;
+	int SumGatesArea;
        // GateDatabase gate_db_;
 
         // Resizes the nodes_ vector to fit the node_id
@@ -35,7 +37,7 @@ class Circuit
     public:
         Circuit(const std::string& ckt_file);
         ~Circuit();
-
+        int get_ckt_size(); 
         void print_node_info(const int& construction_id);
   //      void test();
 };
