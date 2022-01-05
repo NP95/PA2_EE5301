@@ -14,9 +14,9 @@ unordered_map<string, int> GateMap;
 unordered_map<string,vector<string>> FanOutMap;
 unordered_map<string,int> ConstructionIDMap;
 
-int initChipWidth;
-int initChipHeight;
-int SumGatesArea = 0;
+//int initChipWidth;
+//int initChipHeight;
+//int SumGatesArea = 0;
 
 
 
@@ -35,27 +35,32 @@ GateMap.insert(make_pair("XNOR",6));
 GateMap.insert(make_pair("INPUT",1));
 GateMap.insert(make_pair("OUTPUT",1));
 GateMap.insert(make_pair("DFF",9));
-    // cout << "Parsing circuit file: " << ckt_file << endl;
+     cout << "Parsing circuit file: " << ckt_file << endl;
     ifstream ifs(ckt_file.c_str());
     if (!ifs.is_open()) 
     {
         cout << "Error opening file " << ckt_file << endl;
         return;
     }
-    int Node_Construction_ID = 0; //Use this for 
+    int Node_Construction_ID = 1; //Use this for ITC99
     int construction_id; // Use this for ISC85
     nodes_.reserve(NODE_BUF_SIZE);
-
+    cout << " Constructing regexes" << endl;
     const regex input_pad_regex_isc85("INPUT\\((\\d+)\\)");
+    cout << "Failed at first" << endl;
     const regex output_pad_regex_isc85("OUTPUT\\((\\d+)\\)");
     const regex node_regex_isc85("(\\d+)=([a-zA-Z0-9_]+)\\(([0-9,\\s]+)\\)");
     const regex input_pad_regex_itc99("INPUT\\(([a-zA-Z0-9_]+)\\)");
+    cout << "Failed at 5th" << endl;
     const regex output_pad_regex_itc99("OUTPUT\\(([a-zA-Z0-9_]+)\\)");
-    const regex node_regex_itc99("([a-zA-Z0-9_]+)=([A-Z]+)\\((([a-zA-Z0-9_]+,?)+)\\");
-
+    cout << "Failed at 7th" << endl;
+    const regex node_regex_itc99("([a-zA-Z0-9_]+)=([A-Z]+)\\((([a-zA-Z0-9_]+,?)+)\\)");
+    cout << "Failed at 8th" << endl;  
     const regex isc85_detect("# c[0-9]*");
 
+    cout << "Failed at 8th" << endl;  
     const regex itc99_detect("# edf2bench v0.8");
+    cout << "Constructed regexes " << endl;
     smatch filetype;
     smatch output_pad_regex_match;
     smatch input_pad_regex_match;
@@ -69,22 +74,24 @@ GateMap.insert(make_pair("DFF",9));
     {
         string line;
         getline(ifs, line);
-
+        cout << "Entered the file" << endl;
 	if(!file_type_check_status)
 	{ 
                if(regex_match(line,filetype,itc99_detect))
 	       {
 	       file_type_is_ITC99 = true;
+		  cout << "Yo this is a ITC99" << endl;
 	       file_type_check_status++;
 	       }
 
                if(regex_match(line,filetype,isc85_detect))
 	       {
 	       file_type_is_ISC85 = true;
+		  cout << "Yo this is a ISC85" << endl;
 	       file_type_check_status++;
 	       }
 	}
-
+        cout << "Figured out the file type" <<endl; 
         // We only need to parse before the comment
         string code_line = line.substr(0, line.find("#"));
         NodeID node_id; // What is the point of this? 
@@ -93,7 +100,7 @@ GateMap.insert(make_pair("DFF",9));
           {
         // Remove all whitespace to make regex simpler
         code_line.erase(remove_if(code_line.begin(), code_line.end(), ::isspace), code_line.end());
-
+        
         if (code_line.length() <= 0)
             continue;
 
@@ -220,14 +227,14 @@ GateMap.insert(make_pair("DFF",9));
 
 	else if(file_type_is_ITC99)
 	{
-              
+              cout<< " Yo you are a ITC99 file" << endl;
         // Remove all whitespace to make regex simpler
         code_line.erase(remove_if(code_line.begin(), code_line.end(), ::isspace), code_line.end());
 
         if (code_line.length() <= 0)
             continue;
 
-        // cout << code_line << endl;
+         cout << code_line << endl;
 
         // Find INPUT(<nodeNumber>)
         regex_match(code_line, input_pad_regex_match, input_pad_regex_itc99);
@@ -327,6 +334,7 @@ GateMap.insert(make_pair("DFF",9));
           SumGatesArea = SumGatesArea + gate_area;
             }
             continue;
+    cout << "Gate Area Sum:" << SumGatesArea<< endl;  
         }
 
 
@@ -338,17 +346,17 @@ initChipWidth = ceil(sqrt(SumGatesArea));
 initChipHeight = ceil(SumGatesArea/initChipWidth);
 
 //Initialize the chip here
-vector<vector<gate_location>> Chip;
-Chip.resize(initChipHeight);
-for (int i = 0; i < initChipHeight; ++i)
- {
-    Chip[i].resize(initChipWidth);
- }
+//vector<vector<gate_location>> Chip;
+//Chip.resize(initChipHeight);
+//for (int i = 0; i < initChipHeight; ++i)
+// {
+//    Chip[i].resize(initChipWidth);
+ //}
 
 
     } 
 
- 
+    } 
 
 Circuit::~Circuit() {
     for(const auto& node_ptr: nodes_) {
@@ -401,10 +409,16 @@ void Circuit::print_node_info(const int& node_id) {
         cout <<"Area: "<<nodes_[node_id]->get_area() << " " << endl;
         cout <<"Construction ID: "<<nodes_[node_id]->get_construction_id() << " " << endl;
         cout <<"Gate Type: "<<nodes_[node_id]->get_node_id() << " " << endl;
-        cout <<"Node ID: "<<nodes_[node_id]->get_node_id() << " " << endl;
-        cout <<"Node ID: "<<nodes_[node_id]->get_node_id() << " " << endl;
+       // cout <<"Fanout List: "<<nodes_[node_id]->get_fanout_list() << " " << endl;
+       // cout <<"Fanin List: "<<nodes_[node_id]->get_fanin_list() << " " << endl;
             
             }
+
+
+int Circuit::get_ckt_size()
+{
+	return nodes_.size(); 
+}
     
 //    cout << endl;
 
